@@ -46,8 +46,7 @@ function getX(y, angleDegrees) {
 
 function createQuad() {
   // gaussian instead of random to concentrate quads toward the center
-  let index = floor(constrain(randomGaussian(7.5, 4), 0, 13))
-  console.log(index)
+  let index = floor(constrain(randomGaussian(6.5, 4), 0, 13))
   let val1 = ANGLES[index]
   let val2 = ANGLES[index + 1]
 
