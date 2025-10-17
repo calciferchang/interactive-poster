@@ -5,58 +5,59 @@ function setup() {
   createCanvas(400, 400);
   APEX.x = width / 2
   APEX.y = height / 3
+ 
+  stroke(0)
+  for (let i = 0; i < ANGLES.length; i++) {
+    drawLineFromAngle(ANGLES[i])
+  }
 }
 
 function draw() {
 }
 
 function keyPressed() {
-  stroke(0)
-  for (let i = 0; i < ANGLES.length; i++) {
-    drawLineFromAngle(ANGLES[i])
-  }
-
-  let index = floor(constrain(randomGaussian(6.5, 4), 0, 13))
-  index = 7 // TESTING
-  let val1 = ANGLES[index]
-  let val2 = ANGLES[index + 1]
-
-  let closer = abs(val1) < abs(val2) ? val1 : val2
-  let farther = val1 === closer ? val2 : val1
-  let anglePair = [closer, farther]
-
-  stroke(255, 204, 100)
-  drawLineFromAngle(anglePair[0])
-  stroke('red');
-  drawLineFromAngle(anglePair[1])
-
-  genQuad(anglePair)
+  genQuad()
 }
 
 function getX(y, angleDegrees) {
-  const angle = radians(angleDegrees + 90)
+  const angle = radians(angleDegrees + 90) // change orientation of provided angles to face downwards.
   const dy = y - APEX.y
   const distance = dy / sin(angle)
   const x = APEX.x + distance * cos(angle)
   return x
 }
 
-function genQuad(anglePair) {
+function genQuad() {
+  // gaussian instead of random to concentrate shapes toward the center
+  let index = floor(constrain(randomGaussian(7.5, 4), 0, 15))
+  let val1 = ANGLES[index]
+  let val2 = ANGLES[index + 1]
+
+  // ensure that the angle closest to the center will be mapped first
+  let closer = abs(val1) < abs(val2) ? val1 : val2
+  let farther = val1 === closer ? val2 : val1
+  let angle = [closer, farther]
+
+  stroke(255, 204, 100)
+  drawLineFromAngle(angle[0])
+  stroke('red');
+  drawLineFromAngle(angle[1])
+
   let startY = height / 2
   let quadHeight = 50;
   let deviation = quadHeight / 10
-  
+
   let y1 = startY + 1
-  let x1 = getX(y1, anglePair[0])
+  let x1 = getX(y1, angle[0])
 
   let y2 = y1 + random(width / 40, width / 10)
-  let x2 = getX(y2, anglePair[1])
+  let x2 = getX(y2, angle[1])
 
   let y3 = y2 + quadHeight
-  let x3 = getX(y3, anglePair[1])
+  let x3 = getX(y3, angle[1])
 
   let y4 = y1 + quadHeight + random(-deviation, deviation)
-  let x4 = getX(y4, anglePair[0])
+  let x4 = getX(y4, angle[0])
 
   console.log(`Point 1: (${x1}, ${y1})`)
   console.log(`Point 2: (${x2}, ${y2})`)
