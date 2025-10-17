@@ -5,20 +5,23 @@ function setup() {
   APEX.x = width / 2
   APEX.y = height / 3
 
-  for (let i = 0; i < ANGLES.length; i++) {
-    drawLineFromAngle(ANGLES[i])
-  }
 }
 
 function draw() {
 }
 
 function keyPressed() {
-  stroke(255)
-  let randomAngle = floor(constrain(randomGaussian(8, 4), 0, 16))
-  print(randomAngle)
+  stroke(0)
+  for (let i = 0; i < ANGLES.length; i++) {
+    drawLineFromAngle(ANGLES[i])
+  }
+  
+  stroke(255, 204, 100)
+  let randomAngle = floor(constrain(randomGaussian(7.5, 4), 0, 15))
   drawLineFromAngle(ANGLES[randomAngle])
+  drawLineFromAngle(ANGLES[randomAngle + 1])
 }
+
 function drawLineFromAngle(angleDegrees) {
   const angle = radians(angleDegrees + 90); // to make angles read from relationship to center line
   const y1 = height + 100;
