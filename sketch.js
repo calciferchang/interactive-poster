@@ -1,11 +1,12 @@
 const APEX = {}
 const ANGLES = [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5]
+let quads = []
 
 function setup() {
   createCanvas(400, 400);
   APEX.x = width / 2
   APEX.y = height / 3
- 
+
   stroke(0)
   for (let i = 0; i < ANGLES.length; i++) {
     drawLineFromAngle(ANGLES[i])
@@ -13,10 +14,26 @@ function setup() {
 }
 
 function draw() {
+  background(255)
+ 
+  for (let q of quads) {
+    q.y -= 1
+    
+    if (q.startY < APEX.y) {
+      Object.assign(q, createQuad())
+    }
+   
+    stroke(0)
+    drawQuad(q)
+  }
+
+  for (let i = 0; i < ANGLES.length; i++) {
+    drawLineFromAngle(ANGLES[i])
+  }
 }
 
 function keyPressed() {
-  genQuad()
+  quads.push(createQuad())
 }
 
 function getX(y, angleDegrees) {
@@ -27,9 +44,10 @@ function getX(y, angleDegrees) {
   return x
 }
 
-function genQuad() {
-  // gaussian instead of random to concentrate shapes toward the center
-  let index = floor(constrain(randomGaussian(7.5, 4), 0, 15))
+function createQuad() {
+  // gaussian instead of random to concentrate quads toward the center
+  let index = floor(constrain(randomGaussian(7.5, 4), 0, 13))
+  console.log(index)
   let val1 = ANGLES[index]
   let val2 = ANGLES[index + 1]
 
@@ -43,26 +61,27 @@ function genQuad() {
   stroke('red');
   drawLineFromAngle(angle[1])
 
-  let startY = height / 2
   let quadHeight = 50;
   let deviation = quadHeight / 10
+  return {
+    angle: [closer, farther],
+    y: 300,
+    height: quadHeight,
+    slope: random(height / 80, height / 20),
+    deviation: random(-deviation, deviation)
+  }
+}
 
-  let y1 = startY + 1
-  let x1 = getX(y1, angle[0])
+function drawQuad(q) {
+  let y1 = q.y
+  let x1 = getX(y1, q.angle[0])
+  let y2 = y1 + q.slope
+  let x2 = getX(y2, q.angle[1])
+  let y3 = y2 + q.height
+  let x3 = getX(y3, q.angle[1])
+  let y4 = y1 + q.height + q.deviation
+  let x4 = getX(y4, q.angle[0])
 
-  let y2 = y1 + random(width / 40, width / 10)
-  let x2 = getX(y2, angle[1])
-
-  let y3 = y2 + quadHeight
-  let x3 = getX(y3, angle[1])
-
-  let y4 = y1 + quadHeight + random(-deviation, deviation)
-  let x4 = getX(y4, angle[0])
-
-  console.log(`Point 1: (${x1}, ${y1})`)
-  console.log(`Point 2: (${x2}, ${y2})`)
-  console.log(`Point 3: (${x3}, ${y3})`)
-  console.log(`Point 4: (${x4}, ${y4})`)
   quad(x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
