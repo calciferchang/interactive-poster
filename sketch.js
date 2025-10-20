@@ -6,34 +6,39 @@ function setup() {
   createCanvas(400, 400);
   APEX.x = width / 2
   APEX.y = height / 3
-
-  stroke(0)
-  for (let i = 0; i < ANGLES.length; i++) {
-    drawLineFromAngle(ANGLES[i])
-  }
 }
 
 function draw() {
   background(255)
- 
+
   for (let q of quads) {
     q.y -= 1
-    
-    if (q.startY < APEX.y) {
+    console.log(q.y)
+    if (q.y <= APEX.y) {
       Object.assign(q, createQuad())
+
     }
-   
     stroke(0)
     drawQuad(q)
   }
 
-  for (let i = 0; i < ANGLES.length; i++) {
-    drawLineFromAngle(ANGLES[i])
-  }
+  //  for (let i = 0; i < ANGLES.length; i++) {
+  //    drawLineFromAngle(ANGLES[i])
+  //  }
 }
 
 function keyPressed() {
+  if (key === ' ') { 
+    redraw(); // Advance one frame
+  } else 
+  if (key === 's') { // Spacebar
+    noLoop(); // Advance one frame
+  } else
+  if (key === 'd') {
+    loop()
+  } else {
   quads.push(createQuad())
+  }
 }
 
 function getX(y, angleDegrees) {
@@ -55,11 +60,6 @@ function createQuad() {
   let farther = val1 === closer ? val2 : val1
   let angle = [closer, farther]
 
-  stroke(255, 204, 100)
-  drawLineFromAngle(angle[0])
-  stroke('red');
-  drawLineFromAngle(angle[1])
-
   let quadHeight = 50;
   let deviation = quadHeight / 10
   return {
@@ -80,7 +80,6 @@ function drawQuad(q) {
   let x3 = getX(y3, q.angle[1])
   let y4 = y1 + q.height + q.deviation
   let x4 = getX(y4, q.angle[0])
-
   quad(x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
