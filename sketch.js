@@ -1,3 +1,5 @@
+/// <reference types="p5" />
+
 const APEX = {};
 const SETUP = {
   angles: [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5],
