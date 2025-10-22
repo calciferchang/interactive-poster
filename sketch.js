@@ -1,42 +1,37 @@
 const APEX = {};
-const ANGLES = [
-  -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
-];
-let quads = [];
+const SETUP = {
+  angles: [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5],
+};
+let shapes = [];
 
 function setup() {
   createCanvas(400, 400);
   APEX.x = width / 2;
   APEX.y = height / 3;
+  SETUP.startY = height + 1
 }
 
 function draw() {
   background(255);
 
-  for (let q of quads) {
-    if (q.height === 1) {
-      Object.assign(q, createQuad())
-    } else if (q.y === floor(APEX.y)) {
-      q.height -= 1
+  for (let shape of shapes) {
+    if (shape.y === floor(APEX.y)) {
+      shape.height -= 1
     } else {
-      q.y -= 1
+      shape.y -= 1
     }
     stroke(0);
-    drawQuad(q);
+    drawQuad(shape);
   }
 }
 
 function keyPressed() {
-  if (key === " ") {
-    redraw(); // Advance one frame
-  } else if (key === "s") {
-    // Spacebar
-    noLoop(); // Advance one frame
-  } else if (key === "d") {
-    loop();
-  } else {
-    quads.push(createQuad());
-  }
+  const shape = new Shape(
+    selectBoundaryAngles(),
+    SETUP.startY,
+    generateShapeConfig()
+  )
+  shapes.push(shape);
 }
 
 function getX(y, angleDegrees) {
@@ -47,43 +42,22 @@ function getX(y, angleDegrees) {
   return x;
 }
 
-function createQuad() {
-  // gaussian instead of random to concentrate quads toward the center
-  let index = floor(constrain(randomGaussian(6.5, 4), 0, 13));
-  let val1 = ANGLES[index];
-  let val2 = ANGLES[index + 1];
-
-  // ensure that the angle closest to the center will be mapped first
-  let closer = abs(val1) < abs(val2) ? val1 : val2;
-  let farther = val1 === closer ? val2 : val1;
-  let angle = [closer, farther];
-
-  let quadHeight = 50;
-  let deviation = quadHeight / 10;
-  return {
-    angle: [closer, farther],
-    y: height + 1,
-    height: quadHeight,
-    slope: random(height / 80, height / 20),
-    deviation: random(-deviation, deviation),
-  };
-}
-
-function drawQuad(q) {
-  let y1 = q.y;
+function drawQuad(shape) {
+  let y1 = shape.y;
   let x1
   let y2
   let x2
   if (y1 === floor(APEX.y)) {
     x1 = floor(APEX.x)
   } else {
-    x1 = getX(y1, q.angle[0]);
+    x1 = getX(y1, shape.lanes.inner);
   }
-  y2 = y1 + q.slope;
-  x2 = getX(y2, q.angle[1]); let y3 = y2 + q.height;
-  let x3 = getX(y3, q.angle[1]);
-  let y4 = y1 + q.height + q.deviation;
-  let x4 = getX(y4, q.angle[0]);
+  y2 = y1 + shape.topOffset;
+  x2 = getX(y2, shape.lanes.outer);
+  let y3 = y2 + shape.height;
+  let x3 = getX(y3, shape.lanes.outer);
+  let y4 = y1 + shape.height + shape.bottomOffsetDeviation;
+  let x4 = getX(y4, shape.lanes.inner);
   quad(x1, y1, x2, y2, x3, y3, x4, y4);
 }
 
@@ -95,4 +69,41 @@ function drawLineFromAngle(angleDegrees) {
   const x1 = APEX.x + distance * cos(angle);
 
   line(APEX.x, APEX.y, x1, y1);
+}
+
+class Shape {
+  constructor(lanes, y, config) {
+    this.lanes = lanes
+    this.y = y
+    this.height = config.height
+    this.topOffset = config.topOffset
+    this.bottomOffsetDeviation = config.bottomOffsetDeviation
+  }
+}
+
+// Helper functions
+function selectBoundaryAngles() {
+  const NUM_ANGLES = SETUP.angles.length;
+  const CENTER_INDEX = NUM_ANGLES / 2;
+
+  let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 4), 0, NUM_ANGLES - 2));
+  let leftAngle = SETUP.angles[angleIndex];
+  let rightAngle = SETUP.angles[angleIndex + 1];
+
+  // Ensure that shapes will always be angled towards the center.
+  let inner = abs(leftAngle) < abs(rightAngle) ? leftAngle : rightAngle;
+  let outer = leftAngle === inner ? rightAngle : leftAngle;
+
+  return { inner, outer };
+}
+
+function generateShapeConfig() {
+  let shapeHeight = 50;
+  let deviation = shapeHeight / 10;
+
+  return {
+    height: shapeHeight,
+    topOffset: random(height / 80, height / 20),
+    bottomOffsetDeviation: random(-deviation, deviation)
+  };
 }
