@@ -5,7 +5,7 @@ const ANGLES = [
 let quads = [];
 
 function setup() {
-  createCanvas(400, 800);
+  createCanvas(400, 400);
   APEX.x = width / 2;
   APEX.y = height / 3;
 }
@@ -14,21 +14,16 @@ function draw() {
   background(255);
 
   for (let q of quads) {
-    if (q.height === 0) {
+    if (q.height === 1) {
       Object.assign(q, createQuad())
-    } else if (q.y <= APEX.y) {
+    } else if (q.y === floor(APEX.y)) {
       q.height -= 1
-      q.y += 1  // Move down as it shrinks
+    } else {
+      q.y -= 1
     }
-    q.y -= 1
-
     stroke(0);
     drawQuad(q);
   }
-
-   for (let i = 0; i < ANGLES.length; i++) {
-     drawLineFromAngle(ANGLES[i])
-   }
 }
 
 function keyPressed() {
@@ -76,10 +71,16 @@ function createQuad() {
 
 function drawQuad(q) {
   let y1 = q.y;
-  let x1 = getX(y1, q.angle[0]);
-  let y2 = y1 + q.slope;
-  let x2 = getX(y2, q.angle[1]);
-  let y3 = y2 + q.height;
+  let x1
+  let y2
+  let x2
+  if (y1 === floor(APEX.y)) {
+    x1 = floor(APEX.x)
+  } else {
+    x1 = getX(y1, q.angle[0]);
+  }
+  y2 = y1 + q.slope;
+  x2 = getX(y2, q.angle[1]); let y3 = y2 + q.height;
   let x3 = getX(y3, q.angle[1]);
   let y4 = y1 + q.height + q.deviation;
   let x4 = getX(y4, q.angle[0]);
