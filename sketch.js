@@ -8,8 +8,8 @@ let shapes = [];
 
 function setup() {
   createCanvas(400, 400);
-  APEX.x = width / 2;
-  APEX.y = height / 3;
+  APEX.x = floor(width / 2);
+  APEX.y = floor(height / 3);
   SETUP.startY = height + 1
 }
 
@@ -17,7 +17,7 @@ function draw() {
   background(255);
 
   for (let shape of shapes) {
-    if (shape.y === floor(APEX.y)) {
+    if (shape.y === APEX.y) {
       shape.height -= 1
     } else {
       shape.y -= 1
@@ -36,21 +36,13 @@ function keyPressed() {
   shapes.push(shape);
 }
 
-function getX(y, angleDegrees) {
-  const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
-  const dy = y - APEX.y;
-  const distance = dy / sin(angle);
-  const x = APEX.x + distance * cos(angle);
-  return x;
-}
-
 function drawQuad(shape) {
   let y1 = shape.y;
   let x1
   let y2
   let x2
-  if (y1 === floor(APEX.y)) {
-    x1 = floor(APEX.x)
+  if (y1 === APEX.y) {
+    x1 = APEX.x
   } else {
     x1 = getX(y1, shape.lanes.inner);
   }
@@ -80,7 +72,26 @@ class Shape {
     this.height = config.height
     this.topOffset = config.topOffset
     this.bottomOffsetDeviation = config.bottomOffsetDeviation
+    this.isDead = false
   }
+
+  render() {
+    if (this.y === APEX.y) {
+      this.shrink()
+    } else {
+      this.rise()
+    }
+    if (this.height <= 0) {
+      this.isDead = true;
+    }
+  }
+
+  shrink() {
+    // Drawing a triangle instead of a quad when @ APEX
+
+  }
+
+  rise() { }
 }
 
 // Helper functions
@@ -88,7 +99,7 @@ function selectBoundaryAngles() {
   const NUM_ANGLES = SETUP.angles.length;
   const CENTER_INDEX = NUM_ANGLES / 2;
 
-  let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 4), 0, NUM_ANGLES - 2));
+  let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 4), 0, NUM_ANGLES - 2))
   let leftAngle = SETUP.angles[angleIndex];
   let rightAngle = SETUP.angles[angleIndex + 1];
 
@@ -97,6 +108,14 @@ function selectBoundaryAngles() {
   let outer = leftAngle === inner ? rightAngle : leftAngle;
 
   return { inner, outer };
+}
+
+function getX(y, angleDegrees) {
+  const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
+  const dy = y - APEX.y;
+  const distance = dy / sin(angle);
+  const x = APEX.x + distance * cos(angle);
+  return x;
 }
 
 function generateShapeConfig() {
