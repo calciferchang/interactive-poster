@@ -2,8 +2,31 @@
 
 const APEX = {};
 const SETUP = {
+	spawnRate: 15, // How often shapes will generate
 	angles: [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5],
 };
+
+const COLORS = [
+	{ // Red
+		h: [1, 5],
+		s: [75, 100],
+		b: [30, 95],
+		a: 40
+	},
+	{ // Blue
+		h: [190, 230],
+		s: [30, 85],
+		b: [30, 80],
+		a: 50
+	},
+	{ // Green
+		h: [80, 140],
+		s: [30, 85],
+		b: [18, 60],
+		a: 50
+	}
+]
+	
 let shapes = [];
 
 function setup() {
@@ -23,7 +46,7 @@ function setup() {
 
 function draw() {
 	background(255);
-	if (frameCount % 8 === 0) {  // Generate shapes every 60 frames 
+	if (frameCount % SETUP.spawnRate === 0) {  
 		newShape()
 	}
 	for (let shape of shapes) {
@@ -127,7 +150,7 @@ function newShape() {
 }
 
 function generateColor() {
-	let i = random(0, COLORS.length - 1)	
+	let i = floor(random(0, COLORS.length))	
 	return [
 		// Generate HSB values from predetermined ranges
 		random(COLORS[i].h[0], COLORS[i].h[1]),
@@ -137,12 +160,3 @@ function generateColor() {
 	]
 }
 
-const COLORS = [
-	{ // Blue
-		h: [190, 230],
-		s: [30, 85],
-		b: [30, 80],
-		a: 80
-	}
-]
-	
