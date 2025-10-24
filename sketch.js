@@ -88,7 +88,7 @@ function selectBoundaryAngles() {
 	const NUM_ANGLES = SETUP.angles.length;
 	const CENTER_INDEX = NUM_ANGLES / 2;
 
-	let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 5), 0, NUM_ANGLES - 2))
+	let angleIndex = floor(random(0, NUM_ANGLES - 1)) 
 	let leftAngle = SETUP.angles[angleIndex];
 	let rightAngle = SETUP.angles[angleIndex + 1];
 
