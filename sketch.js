@@ -108,11 +108,11 @@ function getX(y, angleDegrees) {
 }
 
 function generateShapeConfig() {
-	let shapeHeight = 50;
-	let deviation = shapeHeight / 10;
+	let shapeHeight = floor(random(height / 20, height / 8))
+	let deviation = shapeHeight / 10
 	return {
 		segmentHeight: shapeHeight,
-		topOffset: random(4, 12),
+		topOffset: random(height / 100, height / 33),
 		bottomOffsetDeviation: random(-deviation, deviation)
 	};
 }
