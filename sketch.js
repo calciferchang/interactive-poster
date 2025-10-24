@@ -2,7 +2,7 @@
 
 const APEX = {};
 const SETUP = {
-  angles: [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5],
+	angles: [-25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5],
 };
 let shapes = [];
 
@@ -14,84 +14,72 @@ function setup() {
 }
 
 function draw() {
-  background(255);
-
-  for (let shape of shapes) {
-    if (shape.y === APEX.y) {
-      shape.height -= 1
-    } else {
-      shape.y -= 1
-    }
-    stroke(0);
-    drawQuad(shape);
-  }
 }
 
 function keyPressed() {
-  const shape = new Shape(
-    selectBoundaryAngles(),
-    SETUP.startY,
-    generateShapeConfig()
-  )
-  shapes.push(shape);
-}
-
-function drawQuad(shape) {
-  let y1 = shape.y;
-  let x1
-  let y2
-  let x2
-  if (y1 === APEX.y) {
-    x1 = APEX.x
-  } else {
-    x1 = getX(y1, shape.lanes.inner);
-  }
-  y2 = y1 + shape.topOffset;
-  x2 = getX(y2, shape.lanes.outer);
-  let y3 = y2 + shape.height;
-  let x3 = getX(y3, shape.lanes.outer);
-  let y4 = y1 + shape.height + shape.bottomOffsetDeviation;
-  let x4 = getX(y4, shape.lanes.inner);
-  quad(x1, y1, x2, y2, x3, y3, x4, y4);
+	if (key === "s") {
+		noLoop()
+	}
+	if (key === "d") {
+		loop()
+	}
+	if (key === "f") {
+		redraw()
+	}
 }
 
 function drawLineFromAngle(angleDegrees) {
-  const angle = radians(angleDegrees + 90); // to make angles read from relationship to center line
-  const y1 = height + 1;
-  const dy = y1 - APEX.y; // vertical distance to travel
-  const distance = dy / sin(angle); // total distance along the line
-  const x1 = APEX.x + distance * cos(angle);
+	const angle = radians(angleDegrees + 90); // to make angles read from relationship to center line
+	const y1 = height + 1;
 
-  line(APEX.x, APEX.y, x1, y1);
+	line(APEX.x, APEX.y, x1, y1);
 }
 
 class Shape {
-  constructor(lanes, y, config) {
-    this.lanes = lanes
-    this.y = y
-    this.height = config.height
-    this.topOffset = config.topOffset
-    this.bottomOffsetDeviation = config.bottomOffsetDeviation
-    this.isDead = false
-  }
+	constructor(lanes, y, config) {
+		this.lanes = lanes
+		this.y = y
+		this.segmentHeight = config.segmentHeight
+		this.topOffset = config.topOffset
+		this.bottomOffsetDeviation = config.bottomOffsetDeviation
+		this.isDead = false
+	}
 
-  render() {
-    if (this.y === APEX.y) {
-      this.shrink()
-    } else {
-      this.rise()
-    }
-    if (this.height <= 0) {
-      this.isDead = true;
-    }
-  }
+	render() {
+		if (this.y === APEX.y) {
+			this.shrink()
+		} else {
+			this.rise()
+		}
+		if (this.segmentHeight === 1) {
+			this.isDead = true;
+		}
+	}
 
-  shrink() {
-    // Drawing a triangle instead of a quad when @ APEX
+	shrink() {
+		// Drawing a triangle instead of a quad when @ APEX
+		let x1 = APEX.x;
+		let y1 = APEX.y;
+		let y2 = y1 + this.segmentHeight + this.topOffset
+		let x2 = getX(y2, this.lanes.outer);
+		let y3 = y1 + this.segmentHeight + this.bottomOffsetDeviation;
+		let x3 = getX(y3, this.lanes.inner);
+		triangle(x1, y1, x2, y2, x3, y3)
+		this.segmentHeight -= 1
+	}
 
-  }
-
-  rise() { }
+	rise() {
+		let y1 = this.y;
+		let x1 = getX(y1, this.lanes.inner);
+		let y2 = y1 + this.topOffset;
+		let x2 = getX(y2, this.lanes.outer);
+		let y3 = y2 + this.segmentHeight;
+		let x3 = getX(y3, this.lanes.outer);
+		let y4 = y1 + this.segmentHeight + this.bottomOffsetDeviation;
+		let x4 = getX(y4, this.lanes.inner);
+		quad(x1, y1, x2, y2, x3, y3, x4, y4);
+		this.y -= 1
+	}
 }
 
 // Helper functions
@@ -119,12 +107,13 @@ function getX(y, angleDegrees) {
 }
 
 function generateShapeConfig() {
-  let shapeHeight = 50;
-  let deviation = shapeHeight / 10;
+	let shapeHeight = 50;
+	let deviation = shapeHeight / 10;
+	return {
+		segmentHeight: shapeHeight,
+		topOffset: random(4, 12),
+		bottomOffsetDeviation: random(-deviation, deviation)
+	};
+}
 
-  return {
-    height: shapeHeight,
-    topOffset: random(height / 80, height / 20),
-    bottomOffsetDeviation: random(-deviation, deviation)
-  };
 }
