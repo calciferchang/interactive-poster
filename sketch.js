@@ -16,7 +16,7 @@ function setup() {
 	APEX.x = floor(width / 2);
 	APEX.y = floor(height / 5);
 	SETUP.startY = height + 1
-	newShape()
+	newShape() // Create a single shape so that the server does not crash on reload.
 }
 
 function draw() {
@@ -34,34 +34,6 @@ function draw() {
 		shape.render()
 	}
 	shapes = shapes.filter(shape => !shape.isDead)
-}
-
-function keyPressed() {
-	if (key === "s") {
-		noLoop()
-	}
-	if (key === "d") {
-		loop()
-	}
-	if (key === "f") {
-		redraw()
-	}
-	const newShape = new Shape(
-		selectBoundaryAngles(),
-		SETUP.startY,
-		generateShapeConfig()
-	)
-	shapes.push(newShape);
-}
-
-function drawLineFromAngle(angleDegrees) {
-	const angle = radians(angleDegrees + 90); // to make angles read from relationship to center line
-	const y1 = height + 1;
-	const dy = y1 - APEX.y; // vertical distance to travel
-	const distance = dy / sin(angle); // total distance along the line
-	const x1 = APEX.x + distance * cos(angle);
-
-	line(APEX.x, APEX.y, x1, y1);
 }
 
 class Shape {
