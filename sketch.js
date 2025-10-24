@@ -7,13 +7,33 @@ const SETUP = {
 let shapes = [];
 
 function setup() {
-  createCanvas(400, 400);
-  APEX.x = floor(width / 2);
-  APEX.y = floor(height / 3);
-  SETUP.startY = height + 1
+	let container = select('#sketch-container');
+	let w = container.width;
+	let h = container.height;
+	createCanvas(w, h);
+	select('canvas').parent('sketch-container');
+
+	APEX.x = floor(width / 2);
+	APEX.y = floor(height / 5);
+	SETUP.startY = height + 1
+	newShape()
 }
 
 function draw() {
+	background(255);
+	if (frameCount % 8 === 0) {  // Generate shapes every 60 frames 
+		const newShape = new Shape(
+			selectBoundaryAngles(),
+			SETUP.startY,
+			generateShapeConfig()
+		)
+		shapes.push(newShape);
+	}
+	for (let shape of shapes) {
+		stroke(0);
+		shape.render()
+	}
+	shapes = shapes.filter(shape => !shape.isDead)
 }
 
 function keyPressed() {
@@ -26,11 +46,20 @@ function keyPressed() {
 	if (key === "f") {
 		redraw()
 	}
+	const newShape = new Shape(
+		selectBoundaryAngles(),
+		SETUP.startY,
+		generateShapeConfig()
+	)
+	shapes.push(newShape);
 }
 
 function drawLineFromAngle(angleDegrees) {
 	const angle = radians(angleDegrees + 90); // to make angles read from relationship to center line
 	const y1 = height + 1;
+	const dy = y1 - APEX.y; // vertical distance to travel
+	const distance = dy / sin(angle); // total distance along the line
+	const x1 = APEX.x + distance * cos(angle);
 
 	line(APEX.x, APEX.y, x1, y1);
 }
@@ -84,26 +113,26 @@ class Shape {
 
 // Helper functions
 function selectBoundaryAngles() {
-  const NUM_ANGLES = SETUP.angles.length;
-  const CENTER_INDEX = NUM_ANGLES / 2;
+	const NUM_ANGLES = SETUP.angles.length;
+	const CENTER_INDEX = NUM_ANGLES / 2;
 
-  let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 4), 0, NUM_ANGLES - 2))
-  let leftAngle = SETUP.angles[angleIndex];
-  let rightAngle = SETUP.angles[angleIndex + 1];
+	let angleIndex = floor(constrain(randomGaussian(CENTER_INDEX, 5), 0, NUM_ANGLES - 2))
+	let leftAngle = SETUP.angles[angleIndex];
+	let rightAngle = SETUP.angles[angleIndex + 1];
 
-  // Ensure that shapes will always be angled towards the center.
-  let inner = abs(leftAngle) < abs(rightAngle) ? leftAngle : rightAngle;
-  let outer = leftAngle === inner ? rightAngle : leftAngle;
+	// Ensure that shapes will always be angled towards the center.
+	let inner = abs(leftAngle) < abs(rightAngle) ? leftAngle : rightAngle;
+	let outer = leftAngle === inner ? rightAngle : leftAngle;
 
-  return { inner, outer };
+	return { inner, outer };
 }
 
 function getX(y, angleDegrees) {
-  const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
-  const dy = y - APEX.y;
-  const distance = dy / sin(angle);
-  const x = APEX.x + distance * cos(angle);
-  return x;
+	const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
+	const dy = y - APEX.y;
+	const distance = dy / sin(angle);
+	const x = APEX.x + distance * cos(angle);
+	return x;
 }
 
 function generateShapeConfig() {
@@ -116,4 +145,11 @@ function generateShapeConfig() {
 	};
 }
 
+function newShape() {
+	const newShape = new Shape(
+		selectBoundaryAngles(),
+		SETUP.startY,
+		generateShapeConfig()
+	)
+	shapes.push(newShape);
 }

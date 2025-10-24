@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.10/lib/p5.js"></script>
-    <meta charset="utf-8" />
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.11.10/lib/p5.js"></script>
     <style>
     * {
       margin: 0;
       padding: 0;
     }
+		main {
+			height: 100vh;
+			width: 100vw;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		#sketch-container {
+			flex-grow: 1;
+			aspect-ratio: 2 / 3;
+  		max-height: 90vh;
+		}
     </style>
+    <meta charset="utf-8" />
   </head>
   <body>
     <main>
+			<div id="sketch-container"></div>
     </main>
-    <script src="sketch.js"></script>
+		<script src="sketch.js"></script>
   </body>
 </html>
