@@ -16,21 +16,17 @@ function setup() {
 	APEX.x = floor(width / 2);
 	APEX.y = floor(height / 5);
 	SETUP.startY = height + 1
+
+	colorMode(HSB) // HSB makes it easier to generate a desirable palette
 	newShape() // Create a single shape so that the server does not crash on reload.
 }
 
 function draw() {
 	background(255);
 	if (frameCount % 8 === 0) {  // Generate shapes every 60 frames 
-		const newShape = new Shape(
-			selectBoundaryAngles(),
-			SETUP.startY,
-			generateShapeConfig()
-		)
-		shapes.push(newShape);
+		newShape()
 	}
 	for (let shape of shapes) {
-		stroke(0);
 		shape.render()
 	}
 	shapes = shapes.filter(shape => !shape.isDead)
@@ -43,10 +39,13 @@ class Shape {
 		this.segmentHeight = config.segmentHeight
 		this.topOffset = config.topOffset
 		this.bottomOffsetDeviation = config.bottomOffsetDeviation
+		this.color = config.color
 		this.isDead = false
 	}
 
 	render() {
+		noStroke()	
+		fill(...this.color)
 		if (this.y === APEX.y) {
 			this.shrink()
 		} else {
@@ -113,7 +112,8 @@ function generateShapeConfig() {
 	return {
 		segmentHeight: shapeHeight,
 		topOffset: random(height / 100, height / 33),
-		bottomOffsetDeviation: random(-deviation, deviation)
+		bottomOffsetDeviation: random(-deviation, deviation),
+		color: generateColor()
 	};
 }
 
@@ -125,3 +125,24 @@ function newShape() {
 	)
 	shapes.push(newShape);
 }
+
+function generateColor() {
+	let i = random(0, COLORS.length - 1)	
+	return [
+		// Generate HSB values from predetermined ranges
+		random(COLORS[i].h[0], COLORS[i].h[1]),
+		random(COLORS[i].s[0], COLORS[i].s[1]),
+		random(COLORS[i].b[0], COLORS[i].b[1]),
+		COLORS[i].a
+	]
+}
+
+const COLORS = [
+	{ // Blue
+		h: [190, 230],
+		s: [30, 85],
+		b: [30, 80],
+		a: 80
+	}
+]
+	
