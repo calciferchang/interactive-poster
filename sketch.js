@@ -8,23 +8,9 @@ const SETUP = {
   ],
 };
 
-const COLORS = [
-  {},
-  {
-    // Blue
-    h: [190, 230],
-    s: [30, 85],
-    b: [30, 80],
-    a: 50,
-  },
-  {
-    // Green
-    h: [80, 140],
-    s: [30, 85],
-    b: [18, 60],
-    a: 50,
-  },
-];
+const COLORS = {
+  blue: {},
+};
 
 let shapes = [];
 
@@ -37,7 +23,6 @@ function setup() {
 
   APEX.x = floor(width / 2);
   APEX.y = floor(height / 5);
-  SETUP.startY = height + 1;
 
   colorMode(HSB); // HSB makes it easier to generate a desirable palette
   newShape(); // Create a single shape so that the server does not crash on reload.
@@ -54,10 +39,32 @@ function draw() {
   shapes = shapes.filter((shape) => !shape.isDead);
 }
 
+function newShape() {
+  let shapeIndex = floor(random(0, SETUP.angles.length - 1));
+  let shapeHeight = floor(random(height / 20, height / 8));
+  let startHeight = height + 1;
+  let deviation = shapeHeight / 10;
+
+  let colorName = random(["red", "blue", "green", "yellow", "neutral"]);
+  let shapeColor =
+    colorName === "neutral" ? determineNeutral(shapeIndex) : hue(colorName);
+
+  shapes.push(
+    new Shape({
+      lanes: getLanes(shapeIndex),
+      y: startHeight,
+      segmentHeight: shapeHeight,
+      topOffset: random(height / 100, height / 33),
+      bottomOffsetDeviation: random(-deviation, deviation),
+      color: shapeColor,
+    }),
+  );
+}
+
 class Shape {
-  constructor(lanes, y, config) {
-    this.lanes = lanes;
-    this.y = y;
+  constructor(config) {
+    this.lanes = config.lanes;
+    this.y = config.y;
     this.segmentHeight = config.segmentHeight;
     this.topOffset = config.topOffset;
     this.bottomOffsetDeviation = config.bottomOffsetDeviation;
@@ -105,13 +112,9 @@ class Shape {
 }
 
 // Helper functions
-function selectBoundaryAngles() {
-  const NUM_ANGLES = SETUP.angles.length;
-  const CENTER_INDEX = NUM_ANGLES / 2;
-
-  let angleIndex = floor(random(0, NUM_ANGLES - 1));
-  let leftAngle = SETUP.angles[angleIndex];
-  let rightAngle = SETUP.angles[angleIndex + 1];
+function getLanes(shapeIndex) {
+  let leftAngle = SETUP.angles[shapeIndex];
+  let rightAngle = SETUP.angles[shapeIndex + 1];
 
   // Ensure that shapes will always be angled towards the center.
   let inner = abs(leftAngle) < abs(rightAngle) ? leftAngle : rightAngle;
@@ -128,59 +131,4 @@ function getX(y, angleDegrees) {
   return x;
 }
 
-function generateShapeConfig() {
-  let shapeHeight = floor(random(height / 20, height / 8));
-  let deviation = shapeHeight / 10;
-  return {
-    segmentHeight: shapeHeight,
-    topOffset: random(height / 100, height / 33),
-    bottomOffsetDeviation: random(-deviation, deviation),
-    color: generateColor(),
-  };
-}
-
-function newShape() {
-  const newShape = new Shape(
-    selectBoundaryAngles(),
-    SETUP.startY,
-    generateShapeConfig(),
-  );
-  shapes.push(newShape);
-}
-
-function generateColor() {
-  let i = floor(random(0, COLORS.length));
-  return [
-    // Generate HSB values from predetermined ranges
-    random(COLORS[i].h[0], COLORS[i].h[1]),
-    random(COLORS[i].s[0], COLORS[i].s[1]),
-    random(COLORS[i].b[0], COLORS[i].b[1]),
-    COLORS[i].a,
-  ];
-}
-
-function randomProperty(obj) {
-  // Returns a random property of obj whose property values are all numbers.
-  // The probability of a property being selected is based on its value.
-  // E.g. {foo:5, bar:10} will return bar twice as often as foo.
-  let result = undefined;
-  let total = 0;
-
-  for (const property in obj) {
-    total += obj[property];
-  }
-
-  let index = Math.random() * total;
-
-  for (const property in obj) {
-    const value = obj[property];
-    if (index < value) {
-      result = property;
-      break;
-    } else {
-      index -= value;
-    }
-  }
-
-  return result;
-}
+function hue(color) {}
