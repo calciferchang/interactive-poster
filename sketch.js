@@ -2,14 +2,43 @@
 
 const APEX = {};
 const SETUP = {
-  spawnRate: 15, // How often shapes will generate
+  spawnRate: 10, // How often shapes will generate
   angles: [
     -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
   ],
 };
+let title;
+
+// Load the image.
+function preload() {
+  title = loadImage("/filled.svg");
+}
 
 const COLORS = {
-  blue: {},
+  red: {
+    light: "rgba(255, 132, 94, 0.85)",
+    normal: "rgba(255, 81, 56, 0.80)",
+    dark: "rgba(222, 54, 44, 0.75)",
+  },
+  blue: {
+    light: "rgba(235, 255, 254, 0.76)",
+    normal: "rgba(156, 178, 217, 0.75)",
+    dark: "rgba(77, 79, 102, 0.75)",
+  },
+  green: {
+    light: "rgba(247, 255, 211, 0.75)",
+    normal: "rgba(84, 150, 94, 0.75)",
+    dark: "rgba(48, 97, 56, 0.75)",
+  },
+  yellow: {
+    light: "rgba(255, 244, 107, 0.84)",
+    normal: "rgba(229, 176, 53, 0.75)",
+    dark: "rgba(168, 137, 40, 0.75)",
+  },
+  neutral: {
+    light: "rgba(255, 249, 235, 0.70)",
+    dark: "rgba(173, 167, 151, 0.40)",
+  },
 };
 
 let shapes = [];
@@ -24,12 +53,11 @@ function setup() {
   APEX.x = floor(width / 2);
   APEX.y = floor(height / 5);
 
-  colorMode(HSB); // HSB makes it easier to generate a desirable palette
   newShape(); // Create a single shape so that the server does not crash on reload.
 }
 
 function draw() {
-  background(255);
+  background("rgba(233, 221, 195, 1)");
   if (frameCount % SETUP.spawnRate === 0) {
     newShape();
   }
@@ -37,6 +65,8 @@ function draw() {
     shape.render();
   }
   shapes = shapes.filter((shape) => !shape.isDead);
+
+  image(title, 0, 0, width, height, 0, 0, title.width, title.height, CONTAIN);
 }
 
 function newShape() {
@@ -45,9 +75,15 @@ function newShape() {
   let startHeight = height + 1;
   let deviation = shapeHeight / 10;
 
-  let colorName = random(["red", "blue", "green", "yellow", "neutral"]);
-  let shapeColor =
-    colorName === "neutral" ? determineNeutral(shapeIndex) : hue(colorName);
+  let colorName = random(["neutral", "red", "blue", "green", "yellow"]);
+  let shapeColor = undefined;
+  if (colorName === "neutral") {
+    // Left half: light, Right half: dark
+    shapeColor = shapeIndex < 7 ? COLORS.neutral.dark : COLORS.neutral.light;
+  } else {
+    let shade = random(["light", "normal", "normal", "dark"]); // Hacky weighting system
+    shapeColor = COLORS[colorName][shade];
+  }
 
   shapes.push(
     new Shape({
@@ -74,7 +110,7 @@ class Shape {
 
   render() {
     noStroke();
-    fill(...this.color);
+    fill(this.color);
     if (this.y === APEX.y) {
       this.shrink();
     } else {
@@ -130,5 +166,3 @@ function getX(y, angleDegrees) {
   const x = APEX.x + distance * cos(angle);
   return x;
 }
-
-function hue(color) {}
