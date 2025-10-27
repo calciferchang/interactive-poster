@@ -1,47 +1,15 @@
 /// <reference types="p5" />
 
-const APEX = {};
-const SETUP = {
-  spawnRate: 10, // How often shapes will generate
-  angles: [
-    -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
-  ],
-};
-let title;
-
-// Load the image.
-function preload() {
-  title = loadImage("/filled.svg");
-}
-
-const COLORS = {
-  red: {
-    light: "rgba(255, 132, 94, 0.85)",
-    normal: "rgba(255, 81, 56, 0.80)",
-    dark: "rgba(222, 54, 44, 0.75)",
-  },
-  blue: {
-    light: "rgba(235, 255, 254, 0.76)",
-    normal: "rgba(156, 178, 217, 0.75)",
-    dark: "rgba(77, 79, 102, 0.75)",
-  },
-  green: {
-    light: "rgba(247, 255, 211, 0.75)",
-    normal: "rgba(84, 150, 94, 0.75)",
-    dark: "rgba(48, 97, 56, 0.75)",
-  },
-  yellow: {
-    light: "rgba(255, 244, 107, 0.84)",
-    normal: "rgba(229, 176, 53, 0.75)",
-    dark: "rgba(168, 137, 40, 0.75)",
-  },
-  neutral: {
-    light: "rgba(255, 249, 235, 0.70)",
-    dark: "rgba(173, 167, 151, 0.40)",
-  },
-};
-
 let shapes = [];
+let title;
+let titlePosition = {};
+let subTitle;
+let subTitlePosition = {};
+
+function preload() {
+  title = loadImage("/assets/title.svg");
+  subTitle = loadImage("/assets/subTitle.svg");
+}
 
 function setup() {
   let container = select("#sketch-container");
@@ -50,8 +18,9 @@ function setup() {
   createCanvas(w, h);
   select("canvas").parent("sketch-container");
 
+  // Set APEX based off canvas size
   APEX.x = floor(width / 2);
-  APEX.y = floor(height / 5);
+  APEX.y = floor(height / 4);
 
   newShape(); // Create a single shape so that the server does not crash on reload.
 }
@@ -65,8 +34,7 @@ function draw() {
     shape.render();
   }
   shapes = shapes.filter((shape) => !shape.isDead);
-
-  image(title, 0, 0, width, height, 0, 0, title.width, title.height, CONTAIN);
+  centerTitle();
 }
 
 function newShape() {
@@ -166,3 +134,52 @@ function getX(y, angleDegrees) {
   const x = APEX.x + distance * cos(angle);
   return x;
 }
+
+function centerTitle() {
+  let targetCenter = 460;
+  let canvasCenter = width / 2;
+  let scale = canvasCenter / targetCenter;
+  image(
+    subTitle,
+    0,
+    height / 2 - (subTitle.height * scale) / 2,
+    subTitle.width * scale,
+    subTitle.height * scale,
+  );
+}
+
+// constants
+const COLORS = {
+  red: {
+    light: "rgba(255, 132, 94, 0.85)",
+    normal: "rgba(255, 81, 56, 0.80)",
+    dark: "rgba(222, 54, 44, 0.75)",
+  },
+  blue: {
+    light: "rgba(235, 255, 254, 0.76)",
+    normal: "rgba(156, 178, 217, 0.75)",
+    dark: "rgba(77, 79, 102, 0.75)",
+  },
+  green: {
+    light: "rgba(247, 255, 211, 0.75)",
+    normal: "rgba(84, 150, 94, 0.75)",
+    dark: "rgba(48, 97, 56, 0.75)",
+  },
+  yellow: {
+    light: "rgba(255, 244, 107, 0.84)",
+    normal: "rgba(229, 176, 53, 0.75)",
+    dark: "rgba(168, 137, 40, 0.75)",
+  },
+  neutral: {
+    light: "rgba(255, 249, 235, 0.70)",
+    dark: "rgba(173, 167, 151, 0.40)",
+  },
+};
+
+const APEX = {};
+const SETUP = {
+  spawnRate: 10, // How often shapes will generate
+  angles: [
+    -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
+  ],
+};
