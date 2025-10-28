@@ -141,9 +141,9 @@ function getX(y, angleDegrees) {
 }
 
 function placeTitle() {
-  let subtitleSegment = CONFIG.apex.x - CONFIG.margin;
+  let subTitleSegment = CONFIG.apex.x - CONFIG.margin;
   let subTitleAspectRatio = subTitle.height / subTitle.width;
-  let subTitleWidth = (segment * 5) / 3;
+  let subTitleWidth = (subTitleSegment * 5) / 3;
   let subTitleHeight = subTitleWidth * subTitleAspectRatio;
   // Position subtitle at 5/3 of title width to center within ampersand
   CONFIG.subTitle = {
@@ -154,7 +154,7 @@ function placeTitle() {
   };
 
   let titleAspectRatio = title.height / title.width;
-  let leftMargin = CONFIG.margin - 2;
+  let leftMargin = CONFIG.margin + 2;
   let rightMargin = CONFIG.margin;
   let titleWidth = width - leftMargin - rightMargin;
   let titleHeight = titleWidth * titleAspectRatio;
