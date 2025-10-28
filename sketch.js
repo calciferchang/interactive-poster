@@ -2,13 +2,11 @@
 
 let shapes = [];
 let title;
-let titlePosition = {};
 let subTitle;
-let subTitlePosition = {};
 
 function preload() {
-  title = loadImage("/assets/title.svg");
-  subTitle = loadImage("/assets/subTitle.svg");
+  title = loadImage("/assets/title.png");
+  subTitle = loadImage("/assets/subTitle.png");
 }
 
 function setup() {
@@ -19,25 +17,35 @@ function setup() {
   select("canvas").parent("sketch-container");
 
   // Set APEX based off canvas size
-  SETUP.apex = [floor(width / 2), floor(height / 4)];
+  CONFIG.apex = {
+    x: floor(width / 2),
+    y: floor(height / 4),
+  };
 
+  placeSubTitle();
+  placeTitle();
   newShape(); // Create a single shape so that the server does not crash on reload.
 }
 
 function draw() {
   background("rgba(233, 221, 195, 1)");
-  if (frameCount % SETUP.spawnRate === 0) {
+  if (frameCount % CONFIG.spawnRate === 0) {
     newShape();
   }
   for (let shape of shapes) {
     shape.render();
   }
   shapes = shapes.filter((shape) => !shape.isDead);
-  centerTitle();
+
+  const { x: subX, y: subY, w: subW, h: subH } = CONFIG.subTitle;
+  image(subTitle, subX, subY, subW, subH);
+	tint(255, 80)
+  const { x: titleX, y: titleY, w: titleW, h: titleH } = CONFIG.title;
+  image(title, titleX, titleY, titleW, titleH);
 }
 
 function newShape() {
-  let shapeIndex = floor(random(0, SETUP.angles.length - 1));
+  let shapeIndex = floor(random(0, CONFIG.angles.length - 1));
   let shapeHeight = floor(random(height / 20, height / 8));
   let startHeight = height + 1;
   let deviation = shapeHeight / 10;
@@ -65,20 +73,20 @@ function newShape() {
 }
 
 class Shape {
-  constructor(config) {
-    this.lanes = config.lanes;
-    this.y = config.y;
-    this.segmentHeight = config.segmentHeight;
-    this.topOffset = config.topOffset;
-    this.bottomOffsetDeviation = config.bottomOffsetDeviation;
-    this.color = config.color;
+  constructor(shapeConfig) {
+    this.lanes = shapeConfig.lanes;
+    this.y = shapeConfig.y;
+    this.segmentHeight = shapeConfig.segmentHeight;
+    this.topOffset = shapeConfig.topOffset;
+    this.bottomOffsetDeviation = shapeConfig.bottomOffsetDeviation;
+    this.color = shapeConfig.color;
     this.isDead = false;
   }
 
   render() {
     noStroke();
     fill(this.color);
-    if (this.y === SETUP.apex[1]) {
+    if (this.y === CONFIG.apex.y) {
       this.shrink();
     } else {
       this.rise();
@@ -90,8 +98,8 @@ class Shape {
 
   shrink() {
     // Drawing a triangle instead of a quad when @ APEX
-    let x1 = SETUP.apex[0];
-    let y1 = SETUP.apex[1];
+    let x1 = CONFIG.apex.x;
+    let y1 = CONFIG.apex.y;
     let y2 = y1 + this.segmentHeight + this.topOffset;
     let x2 = getX(y2, this.lanes.outer);
     let y3 = y1 + this.segmentHeight + this.bottomOffsetDeviation;
@@ -116,8 +124,8 @@ class Shape {
 
 // Helper functions
 function getLanes(shapeIndex) {
-  let leftAngle = SETUP.angles[shapeIndex];
-  let rightAngle = SETUP.angles[shapeIndex + 1];
+  let leftAngle = CONFIG.angles[shapeIndex];
+  let rightAngle = CONFIG.angles[shapeIndex + 1];
 
   // Ensure that shapes will always be angled towards the center.
   let inner = abs(leftAngle) < abs(rightAngle) ? leftAngle : rightAngle;
@@ -128,14 +136,36 @@ function getLanes(shapeIndex) {
 
 function getX(y, angleDegrees) {
   const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
-  const dy = y - SETUP.apex[1];
+  const dy = y - CONFIG.apex.y;
   const distance = dy / sin(angle);
-  const x = SETUP.apex[0] + distance * cos(angle);
+  const x = CONFIG.apex.x + distance * cos(angle);
   return x;
 }
 
-function centerTitle() {
-  let targetCenter = 460;
+function placeSubTitle() {
+  let segment = CONFIG.apex.x - CONFIG.margin;
+  let imageAspectRatio = subTitle.height / subTitle.width;
+  let imageWidth = (segment * 5) / 3;
+  let imageHeight = imageWidth * imageAspectRatio;
+  // Position subtitle at 5/3 of title width to center within ampersand
+  CONFIG.subTitle = {
+    w: imageWidth,
+    h: imageHeight,
+    x: CONFIG.margin,
+    y: CONFIG.apex.y - imageHeight * 0.75,
+  };
+}
+
+function placeTitle() {
+  let imageAspectRatio = title.height / title.width;
+  let imageWidth = width - 2 * CONFIG.margin;
+  let imageHeight = imageWidth * imageAspectRatio;
+  CONFIG.title = {
+    w: imageWidth,
+    h: imageHeight,
+    x: CONFIG.margin,
+    y: CONFIG.margin - 1,
+  };
 }
 
 // constants
@@ -166,11 +196,23 @@ const COLORS = {
   },
 };
 
-const SETUP = {
+const CONFIG = {
   spawnRate: 10, // How often shapes will generate (every X frames)
   angles: [
     -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
   ],
-  apex: [],
-  margin: 24,
+  apex: { x: 0, y: 0 },
+  margin: 8,
+  title: {
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+  },
+  subTitle: {
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+  },
 };
