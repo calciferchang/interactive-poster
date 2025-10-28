@@ -201,16 +201,6 @@ const CONFIG = {
   ],
   apex: { x: 0, y: 0 },
   margin: 8,
-  title: {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-  },
-  subTitle: {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-  },
+  title: { x: 0, y: 0, w: 0, h: 0 },
+  subTitle: { x: 0, y: 0, w: 0, h: 0 },
 };
