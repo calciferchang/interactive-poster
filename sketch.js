@@ -22,13 +22,17 @@ function setup() {
     y: floor(height / 4),
   };
 
-  placeSubTitle();
   placeTitle();
   newShape(); // Create a single shape so that the server does not crash on reload.
 }
 
 function draw() {
   background("rgba(233, 221, 195, 1)");
+  const { x: titleX, y: titleY, w: titleW, h: titleH } = CONFIG.title;
+  image(title, titleX, titleY, titleW, titleH);
+  const { x: subX, y: subY, w: subW, h: subH } = CONFIG.subTitle;
+  image(subTitle, subX, subY, subW, subH);
+
   if (frameCount % CONFIG.spawnRate === 0) {
     newShape();
   }
@@ -36,12 +40,6 @@ function draw() {
     shape.render();
   }
   shapes = shapes.filter((shape) => !shape.isDead);
-
-  const { x: subX, y: subY, w: subW, h: subH } = CONFIG.subTitle;
-  image(subTitle, subX, subY, subW, subH);
-  tint(255, 80);
-  const { x: titleX, y: titleY, w: titleW, h: titleH } = CONFIG.title;
-  image(title, titleX, titleY, titleW, titleH);
 }
 
 function newShape() {
@@ -142,29 +140,29 @@ function getX(y, angleDegrees) {
   return x;
 }
 
-function placeSubTitle() {
-  let segment = CONFIG.apex.x - CONFIG.margin;
-  let imageAspectRatio = subTitle.height / subTitle.width;
-  let imageWidth = (segment * 5) / 3;
-  let imageHeight = imageWidth * imageAspectRatio;
+function placeTitle() {
+  let subtitleSegment = CONFIG.apex.x - CONFIG.margin;
+  let subTitleAspectRatio = subTitle.height / subTitle.width;
+  let subTitleWidth = (segment * 5) / 3;
+  let subTitleHeight = subTitleWidth * subTitleAspectRatio;
   // Position subtitle at 5/3 of title width to center within ampersand
   CONFIG.subTitle = {
-    w: imageWidth,
-    h: imageHeight,
+    w: subTitleWidth,
+    h: subTitleHeight,
     x: CONFIG.margin,
-    y: CONFIG.apex.y - imageHeight * 0.75,
+    y: CONFIG.apex.y - subTitleHeight * 0.75,
   };
-}
 
-function placeTitle() {
-  let imageAspectRatio = title.height / title.width;
-  let imageWidth = width - 2 * CONFIG.margin;
-  let imageHeight = imageWidth * imageAspectRatio;
+  let titleAspectRatio = title.height / title.width;
+  let leftMargin = CONFIG.margin - 2;
+  let rightMargin = CONFIG.margin;
+  let titleWidth = width - leftMargin - rightMargin;
+  let titleHeight = titleWidth * titleAspectRatio;
   CONFIG.title = {
-    w: imageWidth,
-    h: imageHeight,
-    x: CONFIG.margin,
-    y: CONFIG.margin - 1,
+    w: titleWidth,
+    h: titleHeight,
+    x: leftMargin,
+    y: CONFIG.margin,
   };
 }
 
