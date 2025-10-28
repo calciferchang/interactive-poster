@@ -5,8 +5,8 @@ let title;
 let subTitle;
 
 function preload() {
-  title = loadImage("assets/title.png");
-  subTitle = loadImage("assets/subTitle.png");
+  title = loadImage("/assets/title.png");
+  subTitle = loadImage("/assets/subTitle.png");
 }
 
 function setup() {
