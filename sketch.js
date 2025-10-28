@@ -5,8 +5,8 @@ let title;
 let subTitle;
 
 function preload() {
-  title = loadImage("/assets/title.png");
-  subTitle = loadImage("/assets/subTitle.png");
+  title = loadImage("assets/title.png");
+  subTitle = loadImage("assets/subTitle.png");
 }
 
 function setup() {
@@ -39,7 +39,7 @@ function draw() {
 
   const { x: subX, y: subY, w: subW, h: subH } = CONFIG.subTitle;
   image(subTitle, subX, subY, subW, subH);
-	tint(255, 80)
+  tint(255, 80);
   const { x: titleX, y: titleY, w: titleW, h: titleH } = CONFIG.title;
   image(title, titleX, titleY, titleW, titleH);
 }
