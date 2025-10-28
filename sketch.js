@@ -78,7 +78,7 @@ class Shape {
   render() {
     noStroke();
     fill(this.color);
-    if (this.y === APEX.y) {
+    if (this.y === SETUP.apex[1]) {
       this.shrink();
     } else {
       this.rise();
@@ -90,8 +90,8 @@ class Shape {
 
   shrink() {
     // Drawing a triangle instead of a quad when @ APEX
-    let x1 = APEX.x;
-    let y1 = APEX.y;
+    let x1 = SETUP.apex[0];
+    let y1 = SETUP.apex[1];
     let y2 = y1 + this.segmentHeight + this.topOffset;
     let x2 = getX(y2, this.lanes.outer);
     let y3 = y1 + this.segmentHeight + this.bottomOffsetDeviation;
@@ -128,9 +128,9 @@ function getLanes(shapeIndex) {
 
 function getX(y, angleDegrees) {
   const angle = radians(angleDegrees + 90); // change orientation of provided angles to face downwards.
-  const dy = y - APEX.y;
+  const dy = y - SETUP.apex[1];
   const distance = dy / sin(angle);
-  const x = APEX.x + distance * cos(angle);
+  const x = SETUP.apex[0] + distance * cos(angle);
   return x;
 }
 
