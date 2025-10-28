@@ -19,8 +19,7 @@ function setup() {
   select("canvas").parent("sketch-container");
 
   // Set APEX based off canvas size
-  APEX.x = floor(width / 2);
-  APEX.y = floor(height / 4);
+  SETUP.apex = [floor(width / 2), floor(height / 4)];
 
   newShape(); // Create a single shape so that the server does not crash on reload.
 }
@@ -137,15 +136,6 @@ function getX(y, angleDegrees) {
 
 function centerTitle() {
   let targetCenter = 460;
-  let canvasCenter = width / 2;
-  let scale = canvasCenter / targetCenter;
-  image(
-    subTitle,
-    0,
-    height / 2 - (subTitle.height * scale) / 2,
-    subTitle.width * scale,
-    subTitle.height * scale,
-  );
 }
 
 // constants
@@ -176,10 +166,11 @@ const COLORS = {
   },
 };
 
-const APEX = {};
 const SETUP = {
-  spawnRate: 10, // How often shapes will generate
+  spawnRate: 10, // How often shapes will generate (every X frames)
   angles: [
     -25, -23, -20, -16, -13, -11, -6.5, 0, 5.25, 10, 13, 18, 22, 24, 25.5,
   ],
+  apex: [],
+  margin: 24,
 };
